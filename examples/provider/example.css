@@ -1,0 +1,59 @@
+:root {
+    --dark: #212223;
+    --light: white;
+}
+
+body {
+    background-color: var(--dark);
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    font-family: "monospace";
+}
+
+h3 {
+    margin: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+button {
+    margin: 2px;
+    border-radius: 5px;
+    border: 1px;
+    cursor: pointer;
+    font-weight: 600;
+    height: 40px;
+    transition: background-color 0.15s;
+    box-shadow: 4px 0px 4px 4px #ffffff20;
+}
+
+button-light:hover {
+    background-color: limegreen;
+}
+
+button-light:focus {
+    background-color: tomato;
+}
+
+button-light:focus:hover {
+    background-color: yellow;
+}
+
+button-stack {
+    column-gap: 5px;
+}
+
+button-light {
+    color: var(--dark);
+}
+
+button-dark {
+    background-color: var(--dark);
+    color: var(--light);
+}
+
+button-dark:hover {
+    background-color: #333333;
+}

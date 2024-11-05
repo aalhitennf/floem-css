@@ -1,0 +1,17 @@
+[package]
+name = "floem-css"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+floem = { git = "https://github.com/lapce/floem" }
+log = "0.4.22"
+floem-css-macros = { path = "./macro" }
+crossbeam-channel = { version = "0.5.13" }
+lazy_static = { version = "1.5.0" }
+notify = "7.0.0"
+regex = { version = "1.11.1" }
+thiserror = "1.0.68"
+
+[dev-dependencies]
+env_logger = "0.11.5"
