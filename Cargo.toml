@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["benches", "macro", "parser"]
+members = ["macro", "parser"]
 
 [lib]
 doctest = false
