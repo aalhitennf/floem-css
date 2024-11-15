@@ -5,23 +5,23 @@ members = ["macro", "parser"]
 [lib]
 doctest = false
 
-[profile.release]
-debug = true
-
 [workspace.package]
 license = "MIT"
 version = "0.2.0"
-edition = "2021"
 
 [package]
 name = "floem-css"
-edition.workspace = true
 version.workspace = true
 license.workspace = true
+edition = "2021"
 authors = ["Olli Paananen <paananen.olli@pm.me>"]
-description = "Css hot reloading for Floem"
+description = "Hot reloading css-like styles for Floem"
 keywords = ["CSS", "Floem", "style", "reload"]
 repository = "https://github.com/aalhitennf/floem-css"
+readme = "README.md"
+rust-version = "1.80"
+license-file = "LICENSE"
+publish = true
 
 [dependencies]
 floem.workspace = true
@@ -36,7 +36,7 @@ smallvec.workspace = true
 log = "0.4.22"
 smallvec = { version = "1.13.2", features = ["const_new"] }
 floem = "0.2.0"
-floem-css-parser = { path = "./parser" }
+floem-css-parser = { path = "./parser", version = "0.2.0" }
 
 [dev-dependencies]
 env_logger = "0.11.5"

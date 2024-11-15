@@ -1,7 +1,9 @@
 [package]
 name = "floem-css-macros"
-edition.workspace = true
 version.workspace = true
+edition = "2021"
+repository = "https://github.com/aalhitennf/floem-css"
+description = "Macros for floem-css"
 license.workspace = true
 
 [lib]
