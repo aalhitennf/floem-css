@@ -1,16 +1,16 @@
 mod style;
 
-use style::{parse_enum_variant, ParsedVariants};
+use style::ParsedVariants;
 
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput};
 
 #[allow(clippy::missing_panics_doc)]
-#[proc_macro_derive(StyleParser, attributes(key, parser, prop))]
+#[proc_macro_derive(StyleParser, attributes(property, parser, style_class))]
 pub fn derive_style_parser(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    let name = input.ident.clone();
+    let name = input.ident;
     let generics = input.generics;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     let Data::Enum(e) = input.data else {
@@ -18,33 +18,25 @@ pub fn derive_style_parser(input: TokenStream) -> TokenStream {
     };
     let ParsedVariants {
         idents,
-        names,
+        properties,
         parsers,
-        props,
-    } = e.variants.iter().filter_map(parse_enum_variant).fold(
-        ParsedVariants::default(),
-        |mut v, p| {
-            v.add(p);
-            v
-        },
-    );
+        style_classes,
+    } = ParsedVariants::from(&e.variants);
+
     quote! {
-        impl #impl_generics TryFrom<&StyleProperty> for #name #ty_generics #where_clause {
-            type Error = crate::style::parser::StyleError;
-            fn try_from(value: &crate::style::parser::StyleProperty) -> Result<Self, Self::Error> {
-                match value.key.as_str() {
-                    #( #names => Ok(#name::#idents(#parsers(&value.value)?)), )*
-                    val @ _ => Err(crate::style::parser::StyleError::new("Unknown style key", val)),
+        impl #impl_generics #name #ty_generics #where_clause {
+            pub fn from_cow((key, value): (&std::borrow::Cow<'_, str>, &std::borrow::Cow<'_, str>)) -> Option<Self> {
+                match key.as_ref() {
+                    #( #properties => Some(Self::#idents(#parsers(value)?)), )*
+                    unknown => None,
                 }
             }
-        }
 
-        impl #impl_generics #name #ty_generics #where_clause {
-            pub fn apply_transition(s: floem::style::Style, key: &str, t: floem::style::Transition) -> floem::style::Style {
+            fn apply_transition(s: floem::style::Style, key: &str, t: floem::style::Transition) -> floem::style::Style {
                 match key {
-                    #( #names => s.transition(#props, t), )*
-                    val @ _ => {
-                        log::error!("Invalid transition key {val}");
+                    #( #properties => s.transition(#style_classes, t), )*
+                    invalid => {
+                        log::error!("Invalid transition key '{invalid}'");
                         s
                     },
                 }

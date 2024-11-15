@@ -13,13 +13,13 @@ pub struct FileObserver {
 impl FileObserver {
     pub fn new(path: &Path, sender: Sender<()>, recursive: bool) -> Result<Self, ThemeError> {
         let mut watcher = notify::recommended_watcher(move |res| handle_event(res, &sender))?;
-        let mode = if recursive {
+        let mode = if path.is_dir() && recursive {
             RecursiveMode::Recursive
         } else {
             RecursiveMode::NonRecursive
         };
         watcher.watch(path, mode)?;
-        Ok(FileObserver { watcher })
+        Ok(Self { watcher })
     }
 }
 

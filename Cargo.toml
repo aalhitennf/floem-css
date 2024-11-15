@@ -1,17 +1,54 @@
-[package]
-name = "floem-css"
-version = "0.1.0"
+[workspace]
+resolver = "2"
+members = ["benches", "macro", "parser"]
+
+[lib]
+doctest = false
+
+[profile.release]
+debug = true
+
+[workspace.package]
+license = "MIT"
+version = "0.2.0"
 edition = "2021"
 
+[package]
+name = "floem-css"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+authors = ["Olli Paananen <paananen.olli@pm.me>"]
+description = "Css hot reloading for Floem"
+keywords = ["CSS", "Floem", "style", "reload"]
+repository = "https://github.com/aalhitennf/floem-css"
+
 [dependencies]
-floem = { git = "https://github.com/lapce/floem" }
-log = "0.4.22"
-floem-css-macros = { path = "./macro" }
+floem.workspace = true
+floem-css-parser.workspace = true
 crossbeam-channel = { version = "0.5.13" }
-lazy_static = { version = "1.5.0" }
 notify = "7.0.0"
-regex = { version = "1.11.1" }
-thiserror = "1.0.68"
+thiserror = "2.0.1"
+log.workspace = true
+smallvec.workspace = true
+
+[workspace.dependencies]
+log = "0.4.22"
+smallvec = { version = "1.13.2", features = ["const_new"] }
+floem = "0.2.0"
+floem-css-parser = { path = "./parser" }
 
 [dev-dependencies]
 env_logger = "0.11.5"
+
+[build-dependencies]
+floem-css-parser.workspace = true
+
+[workspace.lints.clippy]
+complexity = { level = "warn", priority = -1 }
+correctness = { level = "deny", priority = -1 }
+perf = { level = "deny", priority = -1 }
+restriction = { level = "allow", priority = -1 }
+style = { level = "warn", priority = -1 }
+suspicious = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }

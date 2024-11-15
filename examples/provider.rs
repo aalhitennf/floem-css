@@ -1,17 +1,25 @@
+use std::path::PathBuf;
+
 use floem::keyboard::NamedKey;
 use floem::views::{button, container, text, v_stack, Button, Decorators, Label};
 use floem::{IntoView, View};
-use floem_css::{theme_provider, StyleCss, ThemeOptions};
+use floem_css::{theme_provider, ProviderOptions, StyleCss};
 
 fn main() {
+    // Enable logging to see info and errors
     env_logger::builder()
-        .filter_level(log::LevelFilter::Info)
-        .filter_module("wgpu_core", log::LevelFilter::Off)
-        .filter_module("wgpu_hal", log::LevelFilter::Off)
-        .filter_module("naga", log::LevelFilter::Off)
+        .filter_level(log::LevelFilter::Off)
+        .filter_module("floem_css", log::LevelFilter::Debug)
         .init();
-    // Styles are read from path below. Modify the css file to instantly see changes in app.
-    let options = ThemeOptions::with_path("examples/provider");
+
+    // Styles are read from path. Modify the css file to instantly see changes in app.
+    // Path can point to file or folder.
+    let options = ProviderOptions {
+        path: PathBuf::from("examples/style.css"),
+        ..Default::default()
+    };
+
+    // Wrap your app in theme_provider
     floem::launch(|| theme_provider(main_view, options))
 }
 

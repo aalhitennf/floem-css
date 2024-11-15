@@ -1,17 +1,20 @@
 #![allow(clippy::module_name_repetitions)]
+#![doc = include_str!("../README.md")]
 
 #[cfg(debug_assertions)]
 mod observer;
 
 #[cfg(debug_assertions)]
-#[path = "theme.rs"]
-mod theme;
+mod provider;
 #[cfg(not(debug_assertions))]
-#[path = "theme_static.rs"]
-mod theme;
+#[path = "provider_static.rs"]
+mod provider;
 
 mod error;
+mod options;
+mod parser;
 mod style;
 
-pub use style::StyleCss;
-pub use theme::{theme_provider, Theme, ThemeOptions};
+pub use options::ProviderOptions;
+pub use provider::{theme_provider, StyleProvider};
+pub use style::{StyleCss, StyleMap};

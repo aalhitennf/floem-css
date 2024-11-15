@@ -1,59 +1,103 @@
 use proc_macro2::Span;
-use syn::{Ident, LitStr, Variant};
+use quote::ToTokens;
+use smallvec::SmallVec;
+use syn::{punctuated::Punctuated, token::Comma, Ident, LitStr, Variant};
 
-#[derive(Default)]
+const SIZE: usize = 64;
+
 pub struct ParsedVariants<'a> {
-    pub(crate) idents: Vec<&'a Ident>,
-    pub(crate) names: Vec<LitStr>,
-    pub(crate) parsers: Vec<proc_macro2::Ident>,
-    pub(crate) props: Vec<Ident>,
+    pub(crate) idents: SmallVec<[&'a Ident; SIZE]>,
+    pub(crate) properties: SmallVec<[LitStr; SIZE]>,
+    pub(crate) parsers: SmallVec<[proc_macro2::Ident; SIZE]>,
+    pub(crate) style_classes: SmallVec<[Ident; SIZE]>,
 }
 
 impl<'a> ParsedVariants<'a> {
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            idents: SmallVec::with_capacity(capacity),
+            properties: SmallVec::with_capacity(capacity),
+            parsers: SmallVec::with_capacity(capacity),
+            style_classes: SmallVec::with_capacity(capacity),
+        }
+    }
+
     pub fn add(&mut self, var: ParsedVariant<'a>) {
         self.idents.push(var.ident);
-        self.names.push(var.name);
+        self.properties.push(var.property);
         self.parsers.push(var.parser);
-        self.props.push(var.prop);
+        self.style_classes.push(var.style_class);
     }
 }
 
 pub struct ParsedVariant<'a> {
     ident: &'a Ident,
-    name: LitStr,
+    property: LitStr,
     parser: proc_macro2::Ident,
-    prop: Ident,
+    style_class: Ident,
 }
 
-pub fn parse_enum_variant<'a>(v: &'a Variant) -> Option<ParsedVariant<'a>> {
-    let ident = &v.ident;
-    let Some(name_attr) = v.attrs.iter().find(|a| a.path().is_ident("key")) else {
-        panic!("Missing key attribute for {}", ident.to_string());
-    };
-    let Ok(lit) = name_attr.parse_args::<LitStr>() else {
-        panic!("Key attribute must be string literal");
-    };
-    let parser = v
+impl<'a> From<&'a Punctuated<Variant, Comma>> for ParsedVariants<'a> {
+    fn from(value: &'a Punctuated<Variant, Comma>) -> Self {
+        let mut variants = ParsedVariants::with_capacity(value.len());
+        for variant in value.iter().map(parse_enum_variant) {
+            variants.add(variant);
+        }
+        variants
+    }
+}
+
+pub fn parse_enum_variant(variant: &Variant) -> ParsedVariant<'_> {
+    let property = find_property(variant);
+    let parser = find_parser(variant);
+    let style_class = find_style_class(variant);
+    ParsedVariant {
+        ident: &variant.ident,
+        property,
+        parser,
+        style_class,
+    }
+}
+
+fn find_style_class(variant: &Variant) -> Ident {
+    let style_class_attr = variant
+        .attrs
+        .iter()
+        .find(|a| a.path().is_ident("style_class"))
+        .unwrap_or_else(|| panic!("Missing style_class attribute for {}", variant.ident));
+    style_class_attr.parse_args::<Ident>().unwrap_or_else(|e| {
+        panic!(
+            "style_class attribute must be ident: {}\n{e}",
+            style_class_attr.to_token_stream()
+        )
+    })
+}
+
+fn find_property(variant: &Variant) -> LitStr {
+    let property_attr = variant
+        .attrs
+        .iter()
+        .find(|a| a.path().is_ident("property"))
+        .unwrap_or_else(|| {
+            panic!("Missing property attribute for {}", variant.ident);
+        });
+    property_attr.parse_args::<LitStr>().unwrap_or_else(|e| {
+        panic!(
+            "property attribute must be string literal: {}\n{e}",
+            property_attr.to_token_stream()
+        )
+    })
+}
+
+fn find_parser(variant: &Variant) -> Ident {
+    variant
         .attrs
         .iter()
         .find(|a| a.path().is_ident("parser"))
-        .map(|a| {
+        .and_then(|a| {
             a.parse_args::<LitStr>()
                 .ok()
                 .map(|lit| Ident::new(&lit.value(), Span::call_site()))
         })
-        .expect(&format!("Missing convert fn for {}", ident.to_string()))
-        .expect("Invalid convert fn value");
-    let Some(prop_attr) = v.attrs.iter().find(|a| a.path().is_ident("prop")) else {
-        panic!("Missing prop attribute for {}", ident.to_string());
-    };
-    let Ok(prop) = prop_attr.parse_args::<Ident>() else {
-        panic!("Prop attribute must be ident");
-    };
-    Some(ParsedVariant {
-        ident,
-        name: lit,
-        parser,
-        prop,
-    })
+        .unwrap_or_else(|| panic!("Missing parser fn for {}", variant.ident))
 }

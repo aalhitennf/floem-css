@@ -1,0 +1,11 @@
+[package]
+name = "floem-css-parser"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+log.workspace = true
+smallvec.workspace = true
+floem.workspace = true
+floem-css-macros = { path = "../macro" }

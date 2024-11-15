@@ -8,37 +8,32 @@ body {
     flex-grow: 1;
     justify-content: center;
     align-items: center;
-    font-family: "monospace";
+    font-family: "Fira Sans";
 }
 
 h3 {
     margin: 20px;
     font-size: 16px;
     font-weight: 700;
-    color: var(--dark);
+    color: var(--light);
 }
 
 button {
-    margin: 2px;
-    border-radius: 5px;
+    margin: 10px;
     border: 1px;
     cursor: pointer;
     font-weight: 600;
-    height: 40px;
-    transition: background-color 0.15s;
-    box-shadow: 4px 0px 4px 4px #ffffff20;
+    height: 36px;
+    transition: background-color 150ms;
 }
 
-button-light:hover {
-    background-color: limegreen;
+button:focus {
+    border-color: darkgray;
 }
 
-button-light:focus {
-    background-color: tomato;
-}
-
+button-light:hover,
 button-light:focus:hover {
-    background-color: yellow;
+    background-color: limegreen;
 }
 
 button-stack {
@@ -47,13 +42,22 @@ button-stack {
 
 button-light {
     color: var(--dark);
+    border-color: darkgray;
+    box-shadow: 0px 0px 4px 4px rgba(255, 255, 255, 0.23);
 }
 
 button-dark {
     background-color: var(--dark);
     color: var(--light);
+    box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.43);
 }
 
-button-dark:hover {
+button-dark:hover,
+button-dark:focus:hover {
     background-color: #333333;
+}
+
+button-dark:active {
+    background-color: #252525;
+    color: cyan;
 }
