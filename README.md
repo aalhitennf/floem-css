@@ -79,7 +79,7 @@ button { ... } // Applies to all elements with class "button"
 navigation button { ... } // Applies to all buttons that are descendants of navigation
 ```
 
-But that will not work as expected. You have define specific rule:
+But that will not work as expected. You have to define specific rule:
 
 Rust:
 
