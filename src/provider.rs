@@ -34,30 +34,18 @@ impl StyleProvider {
     /// # Panics
     /// Panics only in debug mode if time is flowing into wrong direction
     fn reload(&self) -> Result<(), ThemeError> {
-        let now = std::time::SystemTime::now();
         let styles_str = floem_css_parser::read_styles(&self.path)?;
         let s = styles_str.clone();
         std::thread::spawn(move || {
             floem_css_parser::analyze(&s);
         });
-        let parsed_styles = parse_css(&styles_str);
-        if parsed_styles.is_empty() {
+        let new_map = parse_css(&styles_str);
+        if new_map.is_empty() {
             log::warn!("Styles parsed but no styles found");
         }
         self.map.update(|map| {
-            map.clear();
-            let _ = std::mem::replace(map, parsed_styles);
+            let _ = std::mem::replace(map, new_map);
         });
-        {
-            let elaps = std::time::SystemTime::now()
-                .duration_since(now)
-                .expect("Time is going backwards");
-            if elaps.as_millis() == 0 {
-                log::debug!("Styles parsed in {}μs", elaps.as_micros());
-            } else {
-                log::debug!("Styles parsed in {}ms", elaps.as_millis());
-            }
-        }
         Ok(())
     }
 }

@@ -73,6 +73,8 @@ fn apply_pseudo(pseudo_class: PseudoClass, to_modify: Style, selector_style: Sty
 
 #[must_use]
 pub fn parse_css(input: &str) -> StyleMap {
+    let now = std::time::SystemTime::now();
+
     let rules = css_to_rules(input);
     let mut map = StyleMap::new_const();
     for rule in &rules {
@@ -109,6 +111,16 @@ pub fn parse_css(input: &str) -> StyleMap {
                 None => to_modify.apply(selector_style),
             };
             map.insert(selector.selector, to_insert);
+        }
+    }
+    {
+        let elaps = std::time::SystemTime::now()
+            .duration_since(now)
+            .expect("Time is going backwards");
+        if elaps.as_millis() == 0 {
+            log::debug!("Styles parsed in {}μs", elaps.as_micros());
+        } else {
+            log::debug!("Styles parsed in {}ms", elaps.as_millis());
         }
     }
     map
