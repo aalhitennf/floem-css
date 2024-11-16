@@ -1,7 +1,10 @@
 use std::path::Path;
 
 use crossbeam_channel::Sender;
-use notify::{Error, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{
+    event::{AccessKind, AccessMode, ModifyKind, RemoveKind, RenameMode},
+    Error, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher,
+};
 
 use crate::error::ThemeError;
 
@@ -26,7 +29,12 @@ impl FileObserver {
 fn handle_event(res: Result<Event, Error>, sender: &Sender<()>) {
     match res {
         Ok(Event {
-            kind: EventKind::Create(_) | EventKind::Modify(_),
+            kind:
+                EventKind::Access(AccessKind::Close(AccessMode::Write))
+                | EventKind::Modify(ModifyKind::Name(RenameMode::To))
+                | EventKind::Modify(ModifyKind::Name(RenameMode::From))
+                | EventKind::Remove(RemoveKind::File)
+                | EventKind::Remove(RemoveKind::Folder),
             ..
         }) => {
             if let Err(e) = sender.send(()) {
