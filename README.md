@@ -129,7 +129,7 @@ Styles are then compiled in the app build-time and responsive updates no longer 
 
 Building example (bash):
 
-    STYLE_PATH=$(pwd)/examples/provider cargo build --example provider --release
+    STYLE_PATH=$(pwd)/examples/style.css cargo build --example provider --release
 
 Or to make it easier set variable for project `.cargo/config.toml`:
 
