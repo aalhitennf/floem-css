@@ -20,7 +20,6 @@ keywords = ["CSS", "Floem", "style", "reload"]
 repository = "https://github.com/aalhitennf/floem-css"
 readme = "README.md"
 rust-version = "1.80"
-license-file = "LICENSE"
 publish = true
 
 [dependencies]
